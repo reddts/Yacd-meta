@@ -3,6 +3,7 @@ import cx from 'clsx';
 import * as React from 'react';
 
 import { keyCodes } from '~/misc/keycode';
+import { getLatencyTestUrlForName } from '~/misc/latency';
 import { getLatencyTestUrl } from '~/store/app';
 import { ProxyItem } from '~/store/types';
 
@@ -252,11 +253,12 @@ const mapState = (s: any, { name }) => {
   const proxies = getProxies(s);
   const delay = getDelay(s);
   const latencyTestUrl = getLatencyTestUrl(s);
+  const testLatencyUrl = getLatencyTestUrlForName(name, latencyTestUrl);
   const proxy = proxies[name] || { name, history: [] };
   return {
     proxy: proxy,
     latency: delay[name],
-    httpsLatencyTest: latencyTestUrl.startsWith('https://'),
+    httpsLatencyTest: testLatencyUrl.startsWith('https://'),
   };
 };
 

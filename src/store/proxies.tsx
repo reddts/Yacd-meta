@@ -16,6 +16,7 @@ import { ClashAPIConfig } from '~/types';
 
 import * as connAPI from '../api/connections';
 import * as proxiesAPI from '../api/proxies';
+import { getLatencyTestUrlForName } from '../misc/latency';
 import { getAutoCloseOldConns, getLatencyTestUrl } from './app';
 
 export const initialState: StateProxies = {
@@ -268,7 +269,7 @@ export function switchProxy(apiConfig: ClashAPIConfig, groupName: string, itemNa
 
 function requestDelayForProxyOnce(apiConfig: ClashAPIConfig, name: string) {
   return async (dispatch: DispatchFn, getState: GetStateFn) => {
-    const latencyTestUrl = getLatencyTestUrl(getState());
+    const latencyTestUrl = getLatencyTestUrlForName(name, getLatencyTestUrl(getState()));
     const res = await proxiesAPI.requestDelayForProxy(apiConfig, name, latencyTestUrl);
     let error = '';
     if (res.ok === false) {

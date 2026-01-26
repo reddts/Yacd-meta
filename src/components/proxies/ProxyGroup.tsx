@@ -5,6 +5,7 @@ import { useQuery } from 'react-query';
 
 import * as proxiesAPI from '~/api/proxies';
 import { fetchVersion } from '~/api/version';
+import { getLatencyTestUrlForName } from '~/misc/latency';
 import {
   getCollapsibleIsOpen,
   getHideUnavailableProxies,
@@ -45,6 +46,10 @@ function ProxyGroupImpl({
   dispatch,
 }) {
   const all = useFilteredAndSorted(allItems, delay, hideUnavailableProxies, proxySortBy, proxies);
+  const testLatencyUrl = useMemo(
+    () => getLatencyTestUrlForName(name, latencyTestUrl),
+    [name, latencyTestUrl]
+  );
 
   const { data: version } = useQuery(['/version', apiConfig], () =>
     fetchVersion('/version', apiConfig)
@@ -76,7 +81,7 @@ function ProxyGroupImpl({
     setIsTestingLatency(true);
     try {
       if (version.meta === true) {
-        await proxiesAPI.requestDelayForProxyGroup(apiConfig, name, latencyTestUrl);
+        await proxiesAPI.requestDelayForProxyGroup(apiConfig, name, testLatencyUrl);
         await dispatch(fetchProxies(apiConfig));
       } else {
         await requestDelayForProxies(apiConfig, all);
@@ -84,7 +89,7 @@ function ProxyGroupImpl({
       }
     } catch (err) {}
     setIsTestingLatency(false);
-  }, [all, apiConfig, dispatch, name, version.meta]);
+  }, [all, apiConfig, dispatch, name, testLatencyUrl, version.meta]);
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
